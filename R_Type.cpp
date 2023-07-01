@@ -17,7 +17,7 @@ using namespace std;
 
 unsigned int pc;
 unsigned char memory[(16 + 64) * 1024];
-int reg[31];
+unsigned int reg[31];
 const unsigned int reg0 = 0;
 
 //R type
@@ -29,7 +29,6 @@ void R_Type(unsigned int instWord)
 
 	unsigned int instPC = pc - 4;
 
-	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
@@ -61,14 +60,14 @@ void R_Type(unsigned int instWord)
 		case 2:
 			{
 				cout << "\tSLT\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-				reg[rd - 1] = (reg[rs1 - 1] < reg[rs2 - 1]) ? 1 : 0;
+				reg[rd - 1] = (static_cast<int>(reg[rs1 - 1]) < static_cast<int>(reg[rs2 - 1])) ? 1 : 0;
 			}
 			break;
 
 		case 3:
 			{
 				cout << "\tSLTU\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-				reg[rd - 1] = (static_cast<unsigned int>(reg[rs1 - 1]) < static_cast<unsigned int>(reg[rs2 - 1])) ? 1 : 0;
+				reg[rd - 1] = (reg[rs1 - 1] < reg[rs2 - 1]) ? 1 : 0;
 			}
 			break;
 
@@ -83,10 +82,11 @@ void R_Type(unsigned int instWord)
 			if(funct7 == 32) {
 				cout << "\tSRA\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
 				reg[rd-1] = reg[rs1-1] >> reg[rs2-1];
+				reg[rd-1] = static_cast<int>(reg[rs1 - 1]) >> reg[rs2 - 1];
 			}
 			else if(funct7 == 0) {
 				cout << "\tSRL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-				reg[rd-1] = static_cast<int>(static_cast<unsigned int>(reg[rs1 - 1]) >> static_cast<unsigned int>(reg[rs2 - 1]));
+				reg[rd-1] = reg[rs1-1] >> reg[rs2-1];
 			}
 			else {
 				cout << "\tUnkown B Instruction \n";
