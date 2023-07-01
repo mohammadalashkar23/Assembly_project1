@@ -79,7 +79,7 @@ void I_type(unsigned int instWord)
 			}
 			else if (rs1 == 0)
 			{
-				if (((int)reg0) < ((int)I_imm))
+				if (signed(reg0) < signed(I_imm))
 				{
 					reg[rd - 1] = 1;
 				}
@@ -91,7 +91,7 @@ void I_type(unsigned int instWord)
 			else
 			{
 
-				if (((int)reg[rs1-1]) < ((int)I_imm))
+				if (signed(reg[rs1-1]) < signed(I_imm))
 				{
 					reg[rd - 1] = 1;
 				}
