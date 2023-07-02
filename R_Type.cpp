@@ -39,10 +39,30 @@ void R_Type(unsigned int instWord)
 		case 0:
 			if(funct7 == 32) {
 				cout << "\tSUB\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					if(rs2==0){
+						reg[rd-1]=0;
+					}
+					reg[rd-1]= 0 - reg[rs2-1];
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1] - 0;
+				else
 				reg[rd-1] = reg[rs1 - 1] - reg[rs2 - 1];
 			}
 			else if(funct7 == 0) {
 				cout << "\tADD\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					if(rs2==0){
+						reg[rd-1]=0;
+					}
+					reg[rd-1]= reg[rs2-1];
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1];
+				else
 				reg[rd-1] = reg[rs1 - 1] + reg[rs2 - 1];
 			}
 			else {
@@ -53,6 +73,13 @@ void R_Type(unsigned int instWord)
 		case 1:
 			{
 				cout << "\tSLL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					reg[rd-1]= 0;
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1];
+				else
 				reg[rd-1] = reg[rs1-1] << reg[rs2-1];
 			}
 			break;
@@ -60,6 +87,16 @@ void R_Type(unsigned int instWord)
 		case 2:
 			{
 				cout << "\tSLT\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					if(rs2==0){
+						reg[rd-1]=0;
+					}
+					reg[rd - 1] = ( 0 < static_cast<int>(reg[rs2 - 1])) ? 1 : 0;
+				}
+				else if(rs2==0)
+				reg[rd - 1] = (static_cast<int>(reg[rs1 - 1]) < 0) ? 1 : 0;
+				else
 				reg[rd - 1] = (static_cast<int>(reg[rs1 - 1]) < static_cast<int>(reg[rs2 - 1])) ? 1 : 0;
 			}
 			break;
@@ -67,6 +104,16 @@ void R_Type(unsigned int instWord)
 		case 3:
 			{
 				cout << "\tSLTU\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					if(rs2==0){
+						reg[rd-1]=0;
+					}
+					reg[rd - 1] = ( 0< reg[rs2 - 1]) ? 1 : 0;
+				}
+				else if(rs2==0)
+				reg[rd - 1] = (reg[rs1 - 1] < 0) ? 1 : 0;
+				else
 				reg[rd - 1] = (reg[rs1 - 1] < reg[rs2 - 1]) ? 1 : 0;
 			}
 			break;
@@ -74,6 +121,16 @@ void R_Type(unsigned int instWord)
 		case 4:
 			{
 				cout << "\tXOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					if(rs2==0){
+						reg[rd-1]= 0 ^ 0;
+					}
+					reg[rd-1]= 0 ^ reg[rs2-1];
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1] ^ 0;
+				else
 				reg[rd-1] = reg[rs1-1] ^ reg[rs2-1];
 			}
 			break;
@@ -81,11 +138,24 @@ void R_Type(unsigned int instWord)
 		case 5:
 			if(funct7 == 32) {
 				cout << "\tSRA\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-				reg[rd-1] = reg[rs1-1] >> reg[rs2-1];
+				if(rd==0) {}
+				else if(rs1==0){
+					reg[rd-1]= 0;
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1];
+				else
 				reg[rd-1] = static_cast<int>(reg[rs1 - 1]) >> reg[rs2 - 1];
 			}
 			else if(funct7 == 0) {
 				cout << "\tSRL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					reg[rd-1]= 0;
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1];
+				else
 				reg[rd-1] = reg[rs1-1] >> reg[rs2-1];
 			}
 			else {
@@ -96,6 +166,16 @@ void R_Type(unsigned int instWord)
 		case 6:
 			{
 				cout << "\tOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					if(rs2==0){
+						reg[rd-1]=0;
+					}
+					reg[rd-1]= 0 | reg[rs2-1];
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1] | 0;
+				else
 				reg[rd-1] = reg[rs1-1] | reg[rs2-1];
 			}
 			break;
@@ -103,6 +183,16 @@ void R_Type(unsigned int instWord)
 		case 7:
 			{
 				cout << "\tAND\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				if(rd==0) {}
+				else if(rs1==0){
+					if(rs2==0){
+						reg[rd-1]=0;
+					}
+					reg[rd-1]= 0 & reg[rs2-1];
+				}
+				else if(rs2==0)
+				reg[rd-1]= reg[rs1-1] & 0;
+				else
 				reg[rd-1] = reg[rs1-1] & reg[rs2-1];
 			}
 			break;
@@ -112,14 +202,4 @@ void R_Type(unsigned int instWord)
 
 	}
 
-}
-
-
-int main() {
-
-	unsigned int instWord = 0b00000000001000001111100000110011;
-	reg[0]= 1; //rs1
-	reg[1]= 0; //rs2
-	R_Type(instWord);
-	cout<< "the output is: " << reg[15]<<endl;
 }
