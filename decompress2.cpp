@@ -42,6 +42,12 @@ unsigned int decompress2(unsigned short compressed_word)
 			rs2= 0x00;
 			rd= 0x00;
 			rs1= rs1C;
+			instword = funct7;
+			instword = (instword <<5) + rs2;
+			instword = (instword <<5) + rs1;
+			instword = (instword <<3) + funct3;
+			instword = (instword <<5) + rd;
+			instword = (instword <<7) + opcode;
 		}
 
 		else{	// MV
@@ -51,6 +57,12 @@ unsigned int decompress2(unsigned short compressed_word)
 			rs2= rs2C;
 			rd= rs1C;
 			rs1= 0x00;
+			instword = funct7;
+			instword = (instword <<5) + rs2;
+			instword = (instword <<5) + rs1;
+			instword = (instword <<3) + funct3;
+			instword = (instword <<5) + rd;
+			instword = (instword <<7) + opcode;
 		}
 	
 	}
@@ -64,6 +76,12 @@ unsigned int decompress2(unsigned short compressed_word)
 			rs2= 0x00;
 			rd= 0x01;
 			rs1= rs1C;
+			instword = funct7;
+			instword = (instword <<5) + rs2;
+			instword = (instword <<5) + rs1;
+			instword = (instword <<3) + funct3;
+			instword = (instword <<5) + rd;
+			instword = (instword <<7) + opcode;
 		}
 
 		else{	// Add
@@ -73,19 +91,32 @@ unsigned int decompress2(unsigned short compressed_word)
 			rs2= rs2C;
 			rd= rs1C;
 			rs1= rs1C;
+			instword = funct7;
+			instword = (instword <<5) + rs2;
+			instword = (instword <<5) + rs1;
+			instword = (instword <<3) + funct3;
+			instword = (instword <<5) + rd;
+			instword = (instword <<7) + opcode;
 		}
 	}
 
 	else {
 		cout << "\tUnkown Compressed Instruction \n";
+		opcode= 0x00;
+		funct3= 0x0;
+		funct7= 0x00;
+		rs2= 0x00;
+		rd= 0x00;
+		rs1= 0x00;
+		instword = funct7;
+		instword = (instword <<5) + rs2;
+		instword = (instword <<5) + rs1;
+		instword = (instword <<3) + funct3;
+		instword = (instword <<5) + rd;
+		instword = (instword <<7) + opcode;
 
 	}
-	instword = funct7;
-	instword = (instword <<5) + rs2;
-	instword = (instword <<5) + rs1;
-	instword = (instword <<3) + funct3;
-	instword = (instword <<5) + rd;
-	instword = (instword <<7) + opcode;
+
 	return instword;
 	
 	}
