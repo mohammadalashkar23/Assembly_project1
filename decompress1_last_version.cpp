@@ -125,7 +125,7 @@ unsigned int decompress1(unsigned short compressed_word)
 
 			rd = rdC_5bits;
 			rs1 = rdC_5bits;
-			I_imm = (nzimm4_0) | ((nzimm4_0) ? 0x00000fe0 : 0x00000000);
+			I_imm = (nzimm4_0) | ((nzimm_5) ? 0x00000fe0 : 0x00000000);//make sure
 		    instword = I_imm;
 			instword = (instword << 5) | rs1;
 			instword = (instword << 3) | funct3;
@@ -181,12 +181,44 @@ unsigned int decompress1(unsigned short compressed_word)
 			}
 		}
 	}
-	//insert the if else for different instruction with opcode =01, but with different func6C or funct3C here
-	else {
+	else if (funct3C == 0b011)
+	{
+
+		if (rdC_5bits == 2)
+		{//c.addi16sp
+			unsigned int add16_imm;
+			add16_imm = (nzimm4_0 >> 5) & 0x00000001;
+			add16_imm = add16_imm | ((nzimm4_0 & 0x00000001) << 1);
+			add16_imm = add16_imm | (((nzimm4_0 >> 3) & 0x00000001) << 2);
+			add16_imm = add16_imm | (((nzimm4_0 >> 1) & 0x00000001) << 3);
+			add16_imm = add16_imm | (((nzimm4_0 >> 2) & 0x00000001) << 4);
+			add16_imm = add16_imm | (nzimm_5) << 5);
+			I_imm = (add16_imm) | ((nzimm_5) ? 0x00000fc0 : 0x00000000);
+			I_imm = I_imm << 4;
+			opcode = 0b0010011;
+			funct3 = 0x0;
+
+			rd = rdC_5bits;
+			rs1 = rdC_5bits;
+			instword = I_imm;
+			instword = (instword << 5) | rs1;
+			instword = (instword << 3) | funct3;
+			instword = (instword << 5) | rd;
+			instword = (instword << 7) | opcode;
+
+
+		}
+		else
+		{
+			//c.lui
+		}
+	}
+	else 
+    {
 		cout << "\tUnkown Compressed Instruction \n";
 
 	}
-	
+	//insert the if else for different instruction with opcode =01, but with different func6C or funct3C here
 	return instword;
 
 }
