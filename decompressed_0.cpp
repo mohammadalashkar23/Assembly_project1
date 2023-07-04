@@ -34,13 +34,14 @@ unsigned int decompress0(unsigned short compressed_word)
 
 		opcode = 0b0000011;
 		funct3 = 0x2;
-		rd = rdC;
-		rs1 = rs1C;
+		rd = rdC+8;
+		rs1 = rs1C+8;
 		instword = Imm;
 		instword = (instword << 5) + rs1;
 		instword = (instword << 3) + funct3;
 		instword = (instword << 5) + rd;
 		instword = (instword << 7) + opcode;
+			cout << "\tC.LW\tx" << rd << ", " << hex<< (int)Imm << " (x" << rs1 << ')' << "\n";
 	}
 	else if (funct3C == 0b110) { //sw
 		rs2C = (compressed_word >> 2) & 0x00000007;
@@ -65,6 +66,7 @@ unsigned int decompress0(unsigned short compressed_word)
 		instword = (instword << 5) + (Imm & 0x01f);
 		instword = (instword << 7) + opcode;
 		//	cout << bitset<32> (instword) <<endl;
+		cout << "\tC.SW\tx" << rs2 << ", " << hex << (int)Imm << " (x" << rs1 << ')' << "\n";
 	}
 	else if (funct3C == 0b010)
 	{
@@ -91,7 +93,7 @@ unsigned int decompress0(unsigned short compressed_word)
 			instword = (instword << 3) | funct3;
 			instword = (instword << 5) | rd;
 			instword = (instword << 7) | opcode;
-
+			cout << "\tC.ADDI4SPN\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)nzuimm << "\n";
 
 		}
 	}
