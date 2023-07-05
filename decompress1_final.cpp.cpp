@@ -49,6 +49,7 @@ unsigned int decompress1(unsigned short compressed_word)
 			instword = (instword << 3) + funct3;
 			instword = (instword << 5) + rd;
 			instword = (instword << 7) + opcode;
+			cout << "\tC.SUB\tx" << rd << ", x" << rs2 << "\n";
 			break;
 
 		case 1: // Xor
@@ -64,6 +65,7 @@ unsigned int decompress1(unsigned short compressed_word)
 			instword = (instword << 3) + funct3;
 			instword = (instword << 5) + rd;
 			instword = (instword << 7) + opcode;
+			cout << "\tC.XOR\tx" << rd << ", x" << rs2 << "\n";
 			break;
 
 		case 2:	//Or
@@ -79,6 +81,7 @@ unsigned int decompress1(unsigned short compressed_word)
 			instword = (instword << 3) + funct3;
 			instword = (instword << 5) + rd;
 			instword = (instword << 7) + opcode;
+			cout << "\tC.OR\tx" << rd << ", x" << rs2 << "\n";
 			break;
 
 		case 3:	//And
@@ -94,22 +97,14 @@ unsigned int decompress1(unsigned short compressed_word)
 			instword = (instword << 3) + funct3;
 			instword = (instword << 5) + rd;
 			instword = (instword << 7) + opcode;
+			cout << "\tC.AND\tx" << rd << ", x" << rs2 << "\n";
 			break;
 		default:
 			cout << "\tUnkown Compressed Instruction \n";
 			//intialize the fields with zeros to ensures that it is not mapped to an instruction in RV32I
-			opcode = 0;
-			funct3 = 0;
-			funct7 = 0;
-			rs2 = 0;
-			rd = 0;
-			rs1 = 0;
-			instword = funct7;
-			instword = (instword << 5) + rs2;
-			instword = (instword << 5) + rs1;
-			instword = (instword << 3) + funct3;
-			instword = (instword << 5) + rd;
-			instword = (instword << 7) + opcode;
+			
+			
+			instword =0;
 		}
 	}
 	else if (funct3C == 0b000)
@@ -189,16 +184,16 @@ unsigned int decompress1(unsigned short compressed_word)
 			lui_imm1 = (compressed_word >> 12) & 0x1; //bit number [5]
 			lui_imm2 = (compressed_word >> 2) & 0x1f; //bit [4:0]
 			rs1C = (compressed_word >> 7) & 0x7;
-			rdC = rs1C+8;
+			rdC = rs1C + 8;
 			instword = (lui_imm1); //bit[5]
 			instword = (instword << 5) + lui_imm2; //bit[4:0]
 			instword = (instword << 5) + rs1C;
 			instword = (instword << 3) + funct3;
 			instword = (instword << 5) + rdC;
 			instword = (instword << 7) + opcode;
-			
+
 			lui_imm1 = ((lui_imm1) ? 0xffffffff : 0x0);
-			lui_imm1 = (lui_imm1 << 5)| lui_imm2;
+			lui_imm1 = (lui_imm1 << 5) | lui_imm2;
 			cout << "\tC.ANDI\tx" << rdC << ", " << hex << "0x" << (int)lui_imm1 << "\n";
 
 		}
@@ -215,11 +210,10 @@ unsigned int decompress1(unsigned short compressed_word)
 			add16_imm = add16_imm | (((nzimm4_0 >> 1) & 0x00000001) << 3);
 			add16_imm = add16_imm | (((nzimm4_0 >> 2) & 0x00000001) << 4);
 			add16_imm = add16_imm | ((nzimm_5) << 5);
-			I_imm = (add16_imm) | ((nzimm_5) ? 0x00000fc0 : 0x00000000);
+			I_imm = (add16_imm) | ((nzimm_5) ? 0xffffffc0 : 0x00000000);
 			I_imm = I_imm << 4;
 			opcode = 0b0010011;
 			funct3 = 0x0;
-
 			rd = rdC_5bits;
 			rs1 = rdC_5bits;
 			instword = I_imm;
@@ -228,32 +222,46 @@ unsigned int decompress1(unsigned short compressed_word)
 			instword = (instword << 5) | rd;
 			instword = (instword << 7) | opcode;
 
-
+			cout << "\tC.ADDI16SP\tx" << rd << ", " << hex << "0x" << (int)I_imm << "\n";
 		}
-		else
+		else //lui
 		{
 			funct3C = (compressed_word >> 13);
 			lui_imm1 = (compressed_word >> 12) & 0x1; //bit [17]
 			lui_imm2 = (compressed_word >> 2) & 0x1f; //bit[16:12]
-			rdC = (compressed_word >> 7) & 0x1f;
-			if (funct3C == 2) {//c.li to addi 
-				opcode = 0b0010011;
-				funct3 = 0x0;
-				instword = (lui_imm1); //bit[5]
-				instword = (instword << 5) + lui_imm2; //bit[4:0]
-				instword = (instword << 5) + 0;
-				instword = (instword << 3) + funct3;
-				instword = (instword << 5) + rdC;
-				instword = (instword << 7) + opcode;
+			rdC = (compressed_word >> 7) & 0x1f; // c.lui 
+			opcode = 0b0110111;
+			lui_imm1 =  ((lui_imm1) ? 0xffffffff : 0x00000000);
+			lui_imm1 = (lui_imm1 << 5) | lui_imm2;
+			instword = (lui_imm1);
+			
+			instword = (instword << 17) + rdC;
+			instword = (instword << 7) + opcode;
+			lui_imm1 = lui_imm1 << 26;
+			cout << "\tC.LUI\tx" << rdC << ", " << hex << "0x" << (int)lui_imm1 << "\n";
 
-			}
-			else if (funct3C == 3) { // c.lui 
-				opcode = 0b0110111;
-				instword = (lui_imm1);
-				instword = (instword << 5) + lui_imm2;
-				instword = (instword << 5) + rdC;
-				instword = (instword << 7) + opcode;
-			}
+		}
+	}
+	else if (funct3C == 0b010) {
+		funct3C = (compressed_word >> 13);
+		lui_imm1 = (compressed_word >> 12) & 0x1; //bit [5]
+		lui_imm2 = (compressed_word >> 2) & 0x1f; //bit[4:0]
+		rdC = (compressed_word >> 7) & 0x1f;
+		if (funct3C == 2) {//c.li to addi 
+			opcode = 0b0010011;
+			funct3 = 0x0;
+			instword = (lui_imm1); //bit[5]
+			instword = (instword << 5) + lui_imm2; //bit[4:0]
+			instword = (instword << 5) + 0;
+			instword = (instword << 3) + funct3;
+			instword = (instword << 5) + rdC;
+			instword = (instword << 7) + opcode;
+
+			cout << "\tC.LI\tx" << rdC << ", " << hex << "0x" << (int)lui_imm1 << "\n";//chaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang
+		}
+		else
+		{
+			cout << "\tUnkown Compressed Instruction \n";
 
 		}
 	}
